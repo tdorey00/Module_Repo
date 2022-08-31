@@ -48,7 +48,7 @@ PS> extension -name "File"
 File.txt
 
 .LINK
-https://github.com/tdorey00/PowerShell_Zone
+https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/DirectoryScanner
 
 #>
     [cmdletBinding(PositionalBinding=$false)]
