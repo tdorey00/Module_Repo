@@ -4,6 +4,8 @@ function Get-FileExtensionSizeList {
 
 Returns A Hashtable Consisting of each given file extensions total size in a directory
 
+WARNING SEARCH IS RECURSIVE... Do not give a directory like "C:/" unless you want it to take forever. 
+
 .DESCRIPTION
 
 Returns A Hashtable Consisting of each given file extensions total size in a directory. 
@@ -22,7 +24,7 @@ Specifies the Directory which will be recursively scanned.
 
 .PARAMETER Extensions
 Specifies the extensions which will be included in the analysis.
-Default Value: TODO
+Default Value: @(".txt", ".js", ".cs", ".exe", ".json", ".dll")
 
 .INPUTS
 
@@ -58,7 +60,57 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/DirectoryScanner
         [string]$Directory,
         #Extensions to be analyzed
         [Parameter(Mandatory=$false)]
-        [string[]]$Extensions = @()
+        [string[]]$Extensions = @(".txt", ".js", ".cs", ".exe", ".json", ".dll")
     )
-    Write-Host $Directory
+
+    Get-DirectoryValidity -Path $Directory
+
+    try{
+        [array]$contents = Get-ChildItem -Recurse -Path $Directory -ErrorAction Stop #Get Contents of given Directory
+    }
+    catch{
+        Write-Host "$(Get-Date) - $($MyInvocation.MyCommand) - UNEXPECTED ERROR: $($_.Exception)" -ForegroundColor Red
+        Write-Host "DESCRIPTION: $($_.ErrorDetails)" -ForegroundColor Red
+        exit
+    }
+
+    $files = [System.Collections.ArrayList]@()
+
+    for([int]$i = 0; $i -lt $contents.length; $i++){ #remove directories from the array and add to files
+        if($contents[$i].Attributes -ieq "Archive"){ #if the entry in the array is an archive
+            $files.Add($contents[$i]) | Out-Null
+        }
+    }
+
+    if($null -eq $files){
+        Write-Host "$(Get-Date) - $($MyInvocation.MyCommand) - Directory '$($pathToUse)' contains no files." -ForegroundColor Red
+        return $null
+    }
+
+    Write-Host $files.Count
+    ##GROUNDWORK IS LAID MAKE IT WORK FOR ALL EXTENSIONS... THEN WE BUILD THE HASHTABLE prob should make it its own helper function
+    #$filtered = $files.Where({$_.EXTENSION -eq ".zip"}, 0)
+    #foreach($file in $filtered){
+    #    Write-Host "File = $($file.Fullname) and $($file.EXTENSION)"
+    #}
+
+}
+
+function Get-DirectoryValidity{
+    # Helper Function
+    # Checks Directory Validity: if its a valid path, if it given path actually exists, and makes sure path is a directory not a file
+    [cmdletBinding(PositionalBinding=$false)]
+    param (
+        #Path that will be checked
+        [Parameter(Mandatory=$true)]
+        [string]$Path
+    )
+
+    if(-not (Test-Path -Path $Path -IsValid)){
+        throw "$(Get-Date) - $($MyInvocation.MyCommand) - Provided Directory '$($Path)' is not valid please check the path and try again."
+    }
+    elseif(-not (Test-Path -Path $Path -PathType Container)){ #Check if path is a Directory or a file
+        throw "$(Get-Date) - $($MyInvocation.MyCommand) - Provided Path '$($Path)' is not a valid Directory or is a file path please enter a valid Directory and not a file path."
+    }
+
 }
