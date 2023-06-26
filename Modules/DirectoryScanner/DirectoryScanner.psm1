@@ -4,7 +4,7 @@ function Get-FileExtensionSizeList {
 
 Returns A Hashtable Consisting of each given file extensions total size in a directory
 
-WARNING SEARCH IS RECURSIVE... Do not give a directory like "C:/" unless you want it to take forever. 
+WARNING: SEARCH IS RECURSIVE... Do not give a directory like "C:/" unless you want it to take forever. 
 
 .DESCRIPTION
 
@@ -15,16 +15,13 @@ A directory is required to be passed in as a string, which which will be interat
 A string array with file extensions may also be passed in, if one is not provided a default one will be used with the following
 extensions:
 
-TODO: Figure out default extensions
-
 It is recommended that you run 'Get-Help -Name "Get-FileExtensionSizeList" -Detailed' for more information
 
 .PARAMETER Directory
 Specifies the Directory which will be recursively scanned. 
 
 .PARAMETER Extensions
-Specifies the extensions which will be included in the analysis.
-Default Value: @(".txt", ".js", ".cs", ".exe", ".json", ".dll")
+Specifies the extensions which will be included in the analysis, expects string extensions beginning with a '.' if none is provided it will sum all extensions.
 
 .INPUTS
 
@@ -58,9 +55,9 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/DirectoryScanner
         #Directory that will be analyzed
         [Parameter(Mandatory=$true)]
         [string]$Directory,
-        #Extensions to be analyzed
+        #Extensions to be analyzed specifically, otherwise parse all extensions
         [Parameter(Mandatory=$false)]
-        [string[]]$Extensions = @(".txt", ".js", ".cs", ".exe", ".json", ".dll")
+        [string[]]$Extensions = @()
     )
 
     Get-DirectoryValidity -Path $Directory
@@ -79,13 +76,16 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/DirectoryScanner
     for([int]$i = 0; $i -lt $contents.length; $i++){ #remove directories from the array and add to files
         if($contents[$i].Attributes -ieq "Archive"){ #if the entry in the array is an archive
             $files.Add($contents[$i]) | Out-Null
+            Write-Verbose $contents[$i]
         }
     }
 
-    if($null -eq $files){
-        Write-Host "$(Get-Date) - $($MyInvocation.MyCommand) - Directory '$($pathToUse)' contains no files." -ForegroundColor Red
+    if($null -eq $files -or $files.Count -eq 0){
+        Write-Host "$(Get-Date) - $($MyInvocation.MyCommand) - Directory '$($Directory)' contains no files." -ForegroundColor Red
         return $null
     }
+
+    [bool]$parseAll = $Extensions.Count -eq 0
 
     Write-Host $files.Count
     ##GROUNDWORK IS LAID MAKE IT WORK FOR ALL EXTENSIONS... THEN WE BUILD THE HASHTABLE prob should make it its own helper function
@@ -96,7 +96,7 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/DirectoryScanner
 
 }
 
-function Get-DirectoryValidity{
+function script:Get-DirectoryValidity{
     # Helper Function
     # Checks Directory Validity: if its a valid path, if it given path actually exists, and makes sure path is a directory not a file
     [cmdletBinding(PositionalBinding=$false)]
