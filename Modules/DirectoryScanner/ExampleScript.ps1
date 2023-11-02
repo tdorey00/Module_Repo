@@ -8,3 +8,4 @@ $files = Get-FileExtensionSizeList -Directory "..\..\..\..\..\Users\Bossman\Docu
 Write-Host $files.Count
 
 
+
