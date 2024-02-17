@@ -18,7 +18,7 @@
     # CompatiblePSEditions = @()
     
     # ID used to uniquely identify this module
-    GUID = '4390d447-b8fa-49bb-a61d-d94c9dcdf62b'
+    GUID = '0dab8b76-0b08-47a4-a6b0-bd36d881e69b'
     
     # Author of this module
     Author = 'Tyler Dorey'
