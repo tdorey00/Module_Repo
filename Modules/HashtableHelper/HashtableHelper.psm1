@@ -1,4 +1,4 @@
-function Convert-PSObjectToHashtable{
+function Convert-PSObjectToHashtable {
 <#
 .SYNOPSIS
 
@@ -100,6 +100,11 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
         if($null -eq $InputObject) { return $null }
 
         if($InputObject -is [System.Collections.Hashtable]) { 
+            # Sometimes PSCustomObjects are also technically Hashtables, so in this case
+            # we want to check if the InputObject is a hashtable and then iterate over the Keys
+            # and recursively call to build up the return. This also works with regular hashtables which is
+            # kind of a neat side effect I suppose. 
+            
             [System.Collections.Hashtable]$hash = @{}
 
             foreach($key in $InputObject.keys) {
@@ -110,6 +115,9 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
         }
 
         if($InputObject -is [psobject]) {
+            # If the InputObject is a PSObject type, iterate over the properties and recursively call
+            # with each property to build a hashtable
+
             [System.Collections.Hashtable]$hash = @{}
 
             foreach($property in $InputObject.PSObject.properties) {
@@ -119,6 +127,7 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
             return $hash
         }
         else {
+            # Base Case and Standard return for non PSObjects, return InputObject
             return $InputObject
         }
     }
