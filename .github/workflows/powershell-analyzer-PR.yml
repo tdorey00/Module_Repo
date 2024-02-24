@@ -33,10 +33,14 @@ jobs:
           else {
             "Nice Work! No Violations Found :)" | Out-File -FilePath .\ScanResult.txt
           }
+          "ERROR_COUNT=$($scanResults.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: "Comment-Pull-Request"
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
           filePath: ./ScanResult.txt
+      - name: "Fail-On-Non-Zero-Count"
+        if: steps.Run-Module-Analyzer.outputs.ERROR_COUNT != 0
+        run: exit 1
 
 
 
