@@ -11,6 +11,7 @@ jobs:
   build:
     permissions:
       contents: read # for actions/checkout to fetch code
+      pull-requests: write # For PR Comment
     name: PSScriptAnalyzer
     runs-on: ubuntu-latest
     steps:
