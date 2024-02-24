@@ -103,7 +103,7 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
             # Sometimes PSCustomObjects are also technically Hashtables, so in this case
             # we want to check if the InputObject is a hashtable and then iterate over the Keys
             # and recursively call to build up the return. This also works with regular hashtables which is
-            # kind of a neat side effect I suppose. 
+            # kind of a neat side effect I suppose.
             
             [System.Collections.Hashtable]$hash = @{}
 
