@@ -1,0 +1,50 @@
+name: PSScriptAnalyzer
+
+on:
+  pull_request:
+    branches: [ "*" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      pull-requests: write # For PR Comment
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+      - name: "Run Module Analyzer"
+        id: run_module_analyzer
+        #Set this to get PR Feedback
+        continue-on-error: true
+        shell: pwsh
+        # Enable Exit Means this will exit with a code equal to the number of violations
+        run: |
+          $scanResults = Invoke-ScriptAnalyzer -Path .\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
+          if($scanResults.Count -ne 0) {
+            "### Please Fix the Following Errors" | Out-File -FilePath .\ScanResult.txt
+            foreach($result in $scanResults){
+              "Rule Name: $($result.RuleName)<br>Severity: $($result.Severity)<br>Script Name: $($result.ScriptName)<br>Line: $($result.Line)<br>Message: $($result.Message)<br><br>" | Out-File -FilePath .\ScanResult.txt -Append
+            }
+          }
+          else {
+            "Nice Work! No Violations Found :)" | Out-File -FilePath .\ScanResult.txt
+          }
+          "ERROR_COUNT=$($scanResults.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: "Comment-Pull-Request"
+        uses: thollander/actions-comment-pull-request@v2.5.0
+        with:
+          filePath: ./ScanResult.txt
+          comment_tag: to_upsert
+          mode: upsert
+      - name: Pass or fail
+        run: |
+          if [[ ${{ steps.run_module_analyzer.outputs.ERROR_COUNT }} == 0 ]]; then exit 0; else exit 1; fi
+
+
+
+
