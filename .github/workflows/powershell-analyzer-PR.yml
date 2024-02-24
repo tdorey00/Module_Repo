@@ -15,9 +15,10 @@ jobs:
     name: PSScriptAnalyzer
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout-Code"
+      - name: "Checkout Code"
         uses: actions/checkout@v4
-      - name: "Run-Module-Analyzer"
+      - name: "Run Module Analyzer"
+        id: run_module_analyzer
         #Set this to get PR Feedback
         continue-on-error: true
         shell: pwsh
@@ -38,9 +39,9 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
           filePath: ./ScanResult.txt
-      - name: "Fail-On-Non-Zero-Count"
-        if: steps.Run-Module-Analyzer.outputs.ERROR_COUNT != 0
-        run: exit 1
+      - name: Pass or fail
+        run: |
+          if [[ ${{ steps.run_module_analyzer.outputs.ERROR_COUNT }} == 0 ]]; then exit 0; else exit 1; fi
 
 
 
