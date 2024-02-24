@@ -39,6 +39,8 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
           filePath: ./ScanResult.txt
+          comment_tag: to_upsert
+          mode: upsert
       - name: Pass or fail
         run: |
           if [[ ${{ steps.run_module_analyzer.outputs.ERROR_COUNT }} == 0 ]]; then exit 0; else exit 1; fi
