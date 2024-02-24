@@ -22,17 +22,20 @@ jobs:
         shell: pwsh
         # Enable Exit Means this will exit with a code equal to the number of violations
         run: |
-          $scanResults = Invoke-ScriptAnalyzer -Path .\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit 
-          foreach($result in $scanResults){
-                 "Rule Name: $($result.RuleName)<br>Severity: $($result.Severity)<br>Script Name: $($result.ScriptName)<br>Line: $($result.Line)<br>Message: $($result.Message)<br><br>" | Out-File -FilePath .\ScanResult.txt -Append
+          $scanResults = Invoke-ScriptAnalyzer -Path .\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
+          if($scanResults.Count -ne 0) {
+            "### Please Fix the Following Errors" | Out-File -FilePath .\ScanResult.txt
+            foreach($result in $scanResults){
+              "Rule Name: $($result.RuleName)<br>Severity: $($result.Severity)<br>Script Name: $($result.ScriptName)<br>Line: $($result.Line)<br>Message: $($result.Message)<br><br>" | Out-File -FilePath .\ScanResult.txt -Append
+            }
           }
-          $stringResult = Get-Content -Path .\ScanResult.txt
-          $stringResult = "Please Fix the Following Violations:<br>" + $stringResult
-          "SCAN_RESULT=$($stringResult)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          else {
+            "Nice Work! No Violations Found :)" | Out-File -FilePath .\ScanResult.txt
+          }
       - name: "Comment-Pull-Request"
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
-          message: ${{ steps.Run-Module-Analyzer.SCAN_RESULT }}
+          filePath: ./ScanResult.txt
 
 
 
