@@ -22,7 +22,8 @@ jobs:
         uses: actions/checkout@v4
       - name: "Run Module Analyzer"
         shell: pwsh
-        run: .\Analyzers\ModuleAnalyzer.ps1
+        run: |
+        $scanResult = Invoke-ScriptAnalyzer -Path $PSScriptRoot\..\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
 
 
 
