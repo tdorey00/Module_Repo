@@ -106,7 +106,7 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
             # kind of a neat side effect I suppose.
             
             [System.Collections.Hashtable]$hash = @{}
-
+whd
             foreach($key in $InputObject.keys) {
                 $hash[$key] = (Convert-PSObjectToHashtable -InputObject $InputObject[$key])
             }    
