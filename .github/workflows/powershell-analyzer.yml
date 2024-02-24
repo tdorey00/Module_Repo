@@ -23,7 +23,7 @@ jobs:
       - name: "Run Module Analyzer"
         shell: pwsh
         run: |
-          Invoke-ScriptAnalyzer -Path ..\..\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
+          Invoke-ScriptAnalyzer -Path .\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
 
 
 
