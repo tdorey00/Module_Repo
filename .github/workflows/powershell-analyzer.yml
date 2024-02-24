@@ -23,7 +23,7 @@ jobs:
       - name: "Run Module Analyzer"
         shell: pwsh
         run: |
-        $scanResult = Invoke-ScriptAnalyzer -Path $PSScriptRoot\..\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
+        $scanResult = Invoke-ScriptAnalyzer -Path ..\..\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit
 
 
 
