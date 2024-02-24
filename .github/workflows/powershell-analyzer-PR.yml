@@ -1,0 +1,39 @@
+name: PSScriptAnalyzer
+
+on:
+  pull_request:
+    branches: [ "*" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout-Code"
+        uses: actions/checkout@v4
+      - name: "Run-Module-Analyzer"
+        #Set this to get PR Feedback
+        continue-on-error: true
+        shell: pwsh
+        # Enable Exit Means this will exit with a code equal to the number of violations
+        run: |
+          $scanResults = Invoke-ScriptAnalyzer -Path .\Modules -Recurse -IncludeDefaultRules -ReportSummary -EnableExit 
+          foreach($result in $scanResults){
+                 "Rule Name: $($result.RuleName)<br>Severity: $($result.Severity)<br>Script Name: $($result.ScriptName)<br>Line: $($result.Line)<br>Message: $($result.Message)<br><br>" | Out-File -FilePath .\ScanResult.txt -Append
+          }
+          $stringResult = Get-Content -Path .\ScanResult.txt
+          $stringResult = "Please Fix the Following Violations:<br>" + $stringResult
+          "SCAN_RESULT=$($stringResult)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: "Comment-Pull-Request"
+        uses: thollander/actions-comment-pull-request@v2.5.0
+        with:
+          message: ${{ steps.Run-Module-Analyzer.SCAN_RESULT }}
+
+
+
+
