@@ -11,9 +11,6 @@ Converts a given PSObject or PSCustomObject into a hashtable.
 All keys will be at the root level unless the PSObject contains within it objects or hashtables in which case the 
 child properties will be added to a parent key. 
 
-
-It is recommended that you run 'Get-Help -Name "Convert-PSObjectToHashtable" -full' for more information
-
 .PARAMETER InputObject
 
 An Object to be turned into a hashtable
@@ -88,7 +85,7 @@ Hi!
 https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
 
 #>
-
+    [OutputType([System.Collections.Hashtable])]
     [CmdletBinding(PositionalBinding)]
     param (
         [Parameter(Mandatory, ValueFromPipeline, Position = 0)]
@@ -99,7 +96,7 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
 
         if($null -eq $InputObject) { return $null }
 
-        if($InputObject -is [System.Collections.Hashtable]) { 
+        if($InputObject -is [System.Collections.Hashtable]) {
             # Sometimes PSCustomObjects are also technically Hashtables, so in this case
             # we want to check if the InputObject is a hashtable and then iterate over the Keys
             # and recursively call to build up the return. This also works with regular hashtables which is
@@ -109,7 +106,7 @@ https://github.com/tdorey00/PowerShell_Zone/tree/main/Modules/HashtableHelper
 
             foreach($key in $InputObject.keys) {
                 $hash[$key] = (Convert-PSObjectToHashtable -InputObject $InputObject[$key])
-            }    
+            }
 
             return $hash
         }
