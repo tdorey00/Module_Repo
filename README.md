@@ -1,5 +1,5 @@
-# PowerShell_Zone
-Repo for storing PowerShell scripts I enjoy or might find useful later on. 
+# Module_Repo
+Repo for storing PowerShell modules I enjoy or might find useful later on. 
 
 ## Current Modules
 - HastableHelper: Functions for working with hashtables. (WIP, but usable)
